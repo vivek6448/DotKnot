@@ -1,121 +1,100 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useMemo } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
+import PillNav from './components/layout/PillNav'
+import { AnnouncementBar } from './components/layout/AnnouncementBar'
+import { Footer } from './components/layout/Footer'
+import { PromoPopup } from './components/layout/PromoPopup'
+import { SocialFloatButtons } from './components/layout/SocialFloatButtons'
+import { useAuth } from './hooks/useAuth'
+import { useCart } from './hooks/useCart'
+import { useIsAdmin } from './hooks/useIsAdmin'
+import { Home } from './pages/Home'
+import { ProductListing } from './pages/ProductListing'
+import { ProductDetail } from './pages/ProductDetail'
+import { Cart } from './pages/Cart'
+import { Checkout } from './pages/Checkout'
+import { OrderStatus } from './pages/OrderStatus'
+import { OrderHistory } from './pages/OrderHistory'
+import { Account } from './pages/Account'
+import { Addresses } from './pages/Addresses'
+import { About } from './pages/About'
+import { Contact } from './pages/Contact'
+import { Shipping } from './pages/policies/Shipping'
+import { Refunds } from './pages/policies/Refunds'
+import { Terms } from './pages/policies/Terms'
+import { AdminLayout } from './pages/admin/AdminLayout'
+import { HomeAdmin } from './pages/admin/HomeAdmin'
+import { ProductsAdmin } from './pages/admin/ProductsAdmin'
+import { CategoriesAdmin } from './pages/admin/CategoriesAdmin'
+import { CouponsAdmin } from './pages/admin/CouponsAdmin'
+import { OrdersAdmin } from './pages/admin/OrdersAdmin'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { user } = useAuth()
+  const { itemCount } = useCart()
+  const { isAdmin } = useIsAdmin()
+  const location = useLocation()
+
+  const navItems = useMemo(
+    () => [
+      { label: 'Home', href: '/' },
+      { label: 'Products', href: '/products' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'About', href: '/about' },
+      { label: `Cart (${itemCount})`, href: '/cart' },
+      { label: user ? 'Account' : 'Sign in', href: '/account' },
+      ...(isAdmin ? [{ label: 'Admin', href: '/admin/products' }] : []),
+    ],
+    [itemCount, user, isAdmin],
+  )
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="flex min-h-screen flex-col">
+      <AnnouncementBar />
 
-      <div className="ticks"></div>
+      <div className="relative h-20">
+        <PillNav
+          logo="/dotknot-logo.png"
+          logoAlt="DotKnot"
+          items={navItems}
+          activeHref={location.pathname}
+          baseColor="#0d0d10"
+          pillColor="#151517"
+          pillTextColor="#e5e5e5"
+          hoveredPillTextColor="#e2452b"
+        />
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductListing />} />
+          <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/orders/:id" element={<OrderStatus />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/addresses" element={<Addresses />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/policies/shipping" element={<Shipping />} />
+          <Route path="/policies/refunds" element={<Refunds />} />
+          <Route path="/policies/terms" element={<Terms />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="home" element={<HomeAdmin />} />
+            <Route path="products" element={<ProductsAdmin />} />
+            <Route path="categories" element={<CategoriesAdmin />} />
+            <Route path="coupons" element={<CouponsAdmin />} />
+            <Route path="orders" element={<OrdersAdmin />} />
+          </Route>
+        </Routes>
+      </main>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <Footer />
+      <SocialFloatButtons />
+      <PromoPopup />
+    </div>
   )
 }
 
