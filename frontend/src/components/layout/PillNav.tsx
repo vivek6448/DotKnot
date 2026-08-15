@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import type { MouseEvent } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import './PillNav.css'
@@ -21,7 +20,6 @@ export interface PillNavProps {
   pillColor?: string
   hoveredPillTextColor?: string
   pillTextColor?: string
-  onMobileMenuClick?: () => void
   initialLoadAnimation?: boolean
 }
 
@@ -46,18 +44,14 @@ const PillNav = ({
   pillColor = '#120F17',
   hoveredPillTextColor = '#120F17',
   pillTextColor,
-  onMobileMenuClick,
   initialLoadAnimation = true,
 }: PillNavProps) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const circleRefs = useRef<(HTMLSpanElement | null)[]>([])
   const tlRefs = useRef<(gsap.core.Timeline | null)[]>([])
   const activeTweenRefs = useRef<(gsap.core.Tween | null)[]>([])
   const logoImgRef = useRef<HTMLImageElement>(null)
   const logoTweenRef = useRef<gsap.core.Tween | null>(null)
-  const hamburgerRef = useRef<HTMLButtonElement>(null)
-  const mobileMenuRef = useRef<HTMLDivElement>(null)
   const navItemsRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLAnchorElement>(null)
 
@@ -120,11 +114,6 @@ const PillNav = ({
       document.fonts.ready.then(layout).catch(() => {})
     }
 
-    const menu = mobileMenuRef.current
-    if (menu) {
-      gsap.set(menu, { visibility: 'hidden', opacity: 0, scaleY: 1 })
-    }
-
     if (initialLoadAnimation) {
       const logoEl = logoRef.current
       const navItems = navItemsRef.current
@@ -165,50 +154,6 @@ const PillNav = ({
     logoTweenRef.current = gsap.to(img, { rotate: 360, duration: 0.2, ease, overwrite: 'auto' })
   }
 
-  const toggleMobileMenu = () => {
-    const newState = !isMobileMenuOpen
-    setIsMobileMenuOpen(newState)
-
-    const hamburger = hamburgerRef.current
-    const menu = mobileMenuRef.current
-
-    if (hamburger) {
-      const lines = hamburger.querySelectorAll<HTMLElement>('.hamburger-line')
-      if (newState) {
-        gsap.to(lines[0], { rotation: 45, y: 3, duration: 0.3, ease })
-        gsap.to(lines[1], { rotation: -45, y: -3, duration: 0.3, ease })
-      } else {
-        gsap.to(lines[0], { rotation: 0, y: 0, duration: 0.3, ease })
-        gsap.to(lines[1], { rotation: 0, y: 0, duration: 0.3, ease })
-      }
-    }
-
-    if (menu) {
-      if (newState) {
-        gsap.set(menu, { visibility: 'visible' })
-        gsap.fromTo(
-          menu,
-          { opacity: 0, y: 10, scaleY: 1 },
-          { opacity: 1, y: 0, scaleY: 1, duration: 0.3, ease, transformOrigin: 'top center' },
-        )
-      } else {
-        gsap.to(menu, {
-          opacity: 0,
-          y: 10,
-          scaleY: 1,
-          duration: 0.2,
-          ease,
-          transformOrigin: 'top center',
-          onComplete: () => {
-            gsap.set(menu, { visibility: 'hidden' })
-          },
-        })
-      }
-    }
-
-    onMobileMenuClick?.()
-  }
-
   const cssVars = {
     ['--base']: baseColor,
     ['--pill-bg']: pillColor,
@@ -242,7 +187,7 @@ const PillNav = ({
           </a>
         )}
 
-        <div className="pill-nav-items desktop-only" ref={navItemsRef}>
+        <div className="pill-nav-items" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
             {items.map((item, i) => (
               <li key={item.href || `item-${i}`} role="none">
@@ -297,43 +242,7 @@ const PillNav = ({
             ))}
           </ul>
         </div>
-
-        <button
-          className="mobile-menu-button mobile-only"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-          ref={hamburgerRef}
-        >
-          <span className="hamburger-line" />
-          <span className="hamburger-line" />
-        </button>
       </nav>
-
-      <div className="mobile-menu-popover mobile-only" ref={mobileMenuRef} style={cssVars}>
-        <ul className="mobile-menu-list">
-          {items.map((item, i) => (
-            <li key={item.href || `mobile-item-${i}`}>
-              {isRouterLink(item.href) ? (
-                <Link
-                  to={item.href}
-                  className={`mobile-menu-link${activeHref === item.href ? ' is-active' : ''}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <a
-                  href={item.href}
-                  className={`mobile-menu-link${activeHref === item.href ? ' is-active' : ''}`}
-                  onClick={(_event: MouseEvent<HTMLAnchorElement>) => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   )
 }

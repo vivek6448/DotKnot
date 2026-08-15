@@ -30,7 +30,9 @@ export function useProducts(categorySlug?: string, searchQuery?: string) {
 
       let query = supabase
         .from('products')
-        .select('id, slug, name, base_price, sale_price, product_images(url, sort_order)')
+        .select(
+          'id, slug, name, base_price, sale_price, product_images(url, sort_order), product_variants(id, stock_qty)',
+        )
         .eq('status', 'active')
         .order('name')
 
@@ -49,13 +51,34 @@ export function useProducts(categorySlug?: string, searchQuery?: string) {
   })
 }
 
+export function useTrendingProducts() {
+  return useQuery({
+    queryKey: ['products', 'trending'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select(
+          'id, slug, name, base_price, sale_price, trending_image_url, product_images(url, sort_order), product_variants(id, stock_qty)',
+        )
+        .eq('status', 'active')
+        .eq('is_trending', true)
+        .order('name')
+
+      if (error) throw error
+      return data
+    },
+  })
+}
+
 export function useFeaturedProducts() {
   return useQuery({
     queryKey: ['products', 'featured'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('id, slug, name, base_price, sale_price, product_images(url, sort_order)')
+        .select(
+          'id, slug, name, base_price, sale_price, featured_image_url, product_images(url, sort_order), product_variants(id, stock_qty)',
+        )
         .eq('status', 'active')
         .eq('is_featured', true)
         .order('name')
@@ -99,7 +122,9 @@ export function useRelatedProducts(categoryId: string | undefined, excludeProduc
 
       const { data, error } = await supabase
         .from('products')
-        .select('id, slug, name, base_price, sale_price, product_images(url, sort_order)')
+        .select(
+          'id, slug, name, base_price, sale_price, product_images(url, sort_order), product_variants(id, stock_qty)',
+        )
         .eq('status', 'active')
         .in('id', productIds)
         .limit(4)

@@ -499,40 +499,49 @@ export type Database = {
           base_price: number
           created_at: string
           description: string | null
+          featured_image_url: string | null
           id: string
           is_featured: boolean
+          is_trending: boolean
           name: string
           processing_days: number | null
           sale_price: number | null
           slug: string
           status: string
           stitch_count: number | null
+          trending_image_url: string | null
         }
         Insert: {
           base_price: number
           created_at?: string
           description?: string | null
+          featured_image_url?: string | null
           id?: string
           is_featured?: boolean
+          is_trending?: boolean
           name: string
           processing_days?: number | null
           sale_price?: number | null
           slug: string
           status?: string
           stitch_count?: number | null
+          trending_image_url?: string | null
         }
         Update: {
           base_price?: number
           created_at?: string
           description?: string | null
+          featured_image_url?: string | null
           id?: string
           is_featured?: boolean
+          is_trending?: boolean
           name?: string
           processing_days?: number | null
           sale_price?: number | null
           slug?: string
           status?: string
           stitch_count?: number | null
+          trending_image_url?: string | null
         }
         Relationships: []
       }

@@ -1,10 +1,13 @@
 import { useMemo } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import PillNav from './components/layout/PillNav'
+import { StaggeredMenu } from './components/layout/StaggeredMenu'
 import { AnnouncementBar } from './components/layout/AnnouncementBar'
+import { ScrollToTop } from './components/layout/ScrollToTop'
 import { Footer } from './components/layout/Footer'
 import { PromoPopup } from './components/layout/PromoPopup'
-import { SocialFloatButtons } from './components/layout/SocialFloatButtons'
+import { SocialFloatButtons, WHATSAPP_URL, INSTAGRAM_URL } from './components/layout/SocialFloatButtons'
 import { useAuth } from './hooks/useAuth'
 import { useCart } from './hooks/useCart'
 import { useIsAdmin } from './hooks/useIsAdmin'
@@ -22,6 +25,7 @@ import { Contact } from './pages/Contact'
 import { Shipping } from './pages/policies/Shipping'
 import { Refunds } from './pages/policies/Refunds'
 import { Terms } from './pages/policies/Terms'
+import { SizeGuide } from './pages/policies/SizeGuide'
 import { AdminLayout } from './pages/admin/AdminLayout'
 import { HomeAdmin } from './pages/admin/HomeAdmin'
 import { ProductsAdmin } from './pages/admin/ProductsAdmin'
@@ -50,9 +54,21 @@ function App() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <ScrollToTop />
+      <Toaster
+        position="top-right"
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: '#151517',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: '#e5e5e5',
+          },
+        }}
+      />
       <AnnouncementBar />
 
-      <div className="relative h-20">
+      <div className="relative hidden h-20 md:block">
         <PillNav
           logo="/dotknot-logo.png"
           logoAlt="DotKnot"
@@ -62,6 +78,25 @@ function App() {
           pillColor="#151517"
           pillTextColor="#e5e5e5"
           hoveredPillTextColor="#e2452b"
+        />
+      </div>
+
+      <div className="md:hidden">
+        <StaggeredMenu
+          position="right"
+          items={navItems.map((item) => ({ label: item.label, link: item.href }))}
+          socialItems={[
+            { label: 'WhatsApp', link: WHATSAPP_URL },
+            { label: 'Instagram', link: INSTAGRAM_URL },
+          ]}
+          displaySocials
+          displayItemNumbering
+          logoUrl="/dotknot-logo.png"
+          logoAlt="DotKnot"
+          menuButtonColor="#fff"
+          openMenuButtonColor="#fff"
+          accentColor="#e2452b"
+          colors={['#ff7a5c', '#e2452b']}
         />
       </div>
 
@@ -81,6 +116,7 @@ function App() {
           <Route path="/policies/shipping" element={<Shipping />} />
           <Route path="/policies/refunds" element={<Refunds />} />
           <Route path="/policies/terms" element={<Terms />} />
+          <Route path="/policies/size-guide" element={<SizeGuide />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="home" element={<HomeAdmin />} />
             <Route path="products" element={<ProductsAdmin />} />

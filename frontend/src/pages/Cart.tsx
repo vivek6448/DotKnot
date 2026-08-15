@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useCart } from '../hooks/useCart'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabaseClient'
+import { ArrowIcon } from '../components/ui/ArrowIcon'
+import { ProximityHeading } from '../components/text/ProximityHeading'
 
 interface CouponResult {
   code: string
@@ -29,8 +32,10 @@ export function Cart() {
     if (error || !data) {
       setCouponError('Invalid or expired coupon')
       setAppliedCoupon(null)
+      toast.error('Invalid or expired coupon')
     } else {
       setAppliedCoupon({ code: data.code, discount_amount: data.discount_amount })
+      toast.success(`Coupon ${data.code} applied`)
     }
 
     setApplying(false)
@@ -40,10 +45,12 @@ export function Cart() {
 
   if (lines.length === 0) {
     return (
-      <div className="p-8 text-center text-gray-300">
-        <p>Your cart is empty.</p>
-        <Link to="/" className="mt-2 inline-block text-accent-soft underline">
-          Continue shopping
+      <div className="flex flex-col items-center p-8 text-center text-gray-300">
+        <img src="/empty-cart.png" alt="" className="w-48 sm:w-56" />
+        <p className="mt-4">Your cart is empty.</p>
+        <Link to="/" className="brutal-btn mt-4">
+          <span>Continue shopping</span>
+          <ArrowIcon />
         </Link>
       </div>
     )
@@ -53,7 +60,9 @@ export function Cart() {
 
   return (
     <div className="mx-auto max-w-2xl p-4">
-      <h1 className="mb-6 text-2xl font-semibold text-white">Your Cart</h1>
+      <ProximityHeading as="h1" className="mb-6 text-2xl font-semibold text-white">
+        Your Cart
+      </ProximityHeading>
 
       <div className="divide-y divide-white/10">
         {lines.map((line) => (
@@ -73,18 +82,24 @@ export function Cart() {
               onChange={(event) => updateQuantity(line.variant_id, Number(event.target.value))}
               className="w-16 rounded border border-white/15 bg-surface px-2 py-1 text-center text-white focus:border-accent focus:outline-none"
             />
-            <button
-              type="button"
-              onClick={() => removeFromCart(line.variant_id)}
-              className="text-sm text-red-400"
-            >
-              Remove
+            <button type="button" onClick={() => removeFromCart(line.variant_id)} className="brutal-btn">
+              <span>Remove</span>
+              <ArrowIcon />
             </button>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 border-t border-white/10 pt-4">
+      <div className="mt-6 flex items-center justify-between border-t border-white/10 pt-4">
+        <p className="text-lg font-medium text-white">Total: ₹{total}</p>
+        <Link to="/checkout" className="brutal-btn">
+          <span>Checkout</span>
+          <ArrowIcon />
+        </Link>
+      </div>
+
+      <div className="fixed bottom-4 left-4 z-40 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-white/15 bg-surface p-4 shadow-lg">
+        <p className="mb-2 text-sm font-medium text-white">Have a coupon?</p>
         {user ? (
           <div className="flex gap-2">
             <input
@@ -117,13 +132,6 @@ export function Cart() {
             Coupon {appliedCoupon.code} applied — -₹{appliedCoupon.discount_amount}
           </p>
         )}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
-        <p className="text-lg font-medium text-white">Total: ₹{total}</p>
-        <Link to="/checkout" className="rounded bg-accent px-4 py-2 text-white hover:bg-accent-soft">
-          Checkout
-        </Link>
       </div>
     </div>
   )

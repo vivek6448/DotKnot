@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
 import { useSetting } from '../../hooks/useSetting'
 import type { Json } from '../../types/database.types'
+import { ArrowIcon } from '../../components/ui/ArrowIcon'
 
 interface HomeHeroSettings {
   title?: string
@@ -46,6 +48,7 @@ export function HomeAdmin() {
     setSaving(true)
     await persist({ title, subtitle, images })
     setSaving(false)
+    toast.success('Home page text saved')
   }
 
   const handleUpload = async (file: File) => {
@@ -57,6 +60,9 @@ export function HomeAdmin() {
       const next = [...images, data.publicUrl]
       setImages(next)
       await persist({ title, subtitle, images: next })
+      toast.success('Poster image uploaded')
+    } else {
+      toast.error('Failed to upload image')
     }
     setUploading(false)
   }
@@ -65,6 +71,7 @@ export function HomeAdmin() {
     const next = images.filter((i) => i !== url)
     setImages(next)
     await persist({ title, subtitle, images: next })
+    toast.success('Poster image removed')
   }
 
   return (
@@ -84,17 +91,13 @@ export function HomeAdmin() {
             className={`${inputClass} mt-1`}
           />
         </label>
-        <button
-          type="button"
-          onClick={handleSaveText}
-          disabled={saving}
-          className="rounded bg-accent px-4 py-2 text-sm text-white hover:bg-accent-soft disabled:opacity-40"
-        >
-          {saving ? 'Saving…' : 'Save text'}
+        <button type="button" onClick={handleSaveText} disabled={saving} className="brutal-btn">
+          <span>{saving ? 'Saving…' : 'Save text'}</span>
+          <ArrowIcon />
         </button>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 rounded border border-white/10 p-3">
         <h3 className="mb-2 text-sm font-medium text-gray-200">Poster images</h3>
         <p className="mb-2 text-xs text-gray-500">
           Cross-fades through these on the home page. Falls back to product photos if empty.

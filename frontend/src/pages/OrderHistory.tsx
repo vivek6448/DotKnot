@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
+import { ProximityHeading } from '../components/text/ProximityHeading'
+import { ArrowIcon } from '../components/ui/ArrowIcon'
 
 const STATUS_LABEL: Record<string, string> = {
   pending_payment: 'Pending payment',
@@ -36,8 +38,9 @@ export function OrderHistory() {
     return (
       <div className="p-8 text-center text-gray-300">
         <p>Sign in to see your order history.</p>
-        <Link to="/account" className="mt-2 inline-block text-accent-soft underline">
-          Sign in
+        <Link to="/account" className="brutal-btn mt-4">
+          <span>Sign in</span>
+          <ArrowIcon />
         </Link>
       </div>
     )
@@ -49,8 +52,9 @@ export function OrderHistory() {
     return (
       <div className="p-8 text-center text-gray-300">
         <p>You haven't placed any orders yet.</p>
-        <Link to="/products" className="mt-2 inline-block text-accent-soft underline">
-          Browse products
+        <Link to="/products" className="brutal-btn mt-4">
+          <span>Browse products</span>
+          <ArrowIcon />
         </Link>
       </div>
     )
@@ -58,7 +62,9 @@ export function OrderHistory() {
 
   return (
     <div className="mx-auto max-w-2xl p-4">
-      <h1 className="mb-6 text-2xl font-semibold text-white">Order History</h1>
+      <ProximityHeading as="h1" className="mb-6 text-2xl font-semibold text-white">
+        Order History
+      </ProximityHeading>
       <div className="divide-y divide-white/10 border-t border-white/10">
         {orders.map((order) => (
           <Link

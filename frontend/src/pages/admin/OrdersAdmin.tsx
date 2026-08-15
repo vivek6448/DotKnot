@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
 
 const STATUS_OPTIONS = ['pending_payment', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']
@@ -23,6 +24,7 @@ export function OrdersAdmin() {
   const handleUpdateStatus = async (id: string, status: string) => {
     await supabase.from('orders').update({ status }).eq('id', id)
     queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
+    toast.success(`Order status updated to ${status}`)
   }
 
   const paidOrders = orders?.filter((o) => o.status !== 'pending_payment' && o.status !== 'cancelled') ?? []

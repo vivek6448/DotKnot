@@ -1,61 +1,98 @@
+import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { WHATSAPP_URL, INSTAGRAM_URL } from './SocialFloatButtons'
+import { WhatsAppIcon, InstagramIcon } from '../ui/icons'
+
+const CONTACT_EMAIL = 'hello@dotknot.in'
+
+const CUSTOMER_SERVICE_LINKS = [
+  { label: 'Contact Us', to: '/contact' },
+  { label: 'Shipping', to: '/policies/shipping' },
+  { label: 'Refunds & Cancellations', to: '/policies/refunds' },
+  { label: 'Terms & Conditions', to: '/policies/terms' },
+  { label: 'Size Guide', to: '/policies/size-guide' },
+]
+
+const SOCIAL_LINKS = [
+  { label: 'WhatsApp', href: WHATSAPP_URL, Icon: WhatsAppIcon },
+  { label: 'Instagram', href: INSTAGRAM_URL, Icon: InstagramIcon },
+]
 
 export function Footer() {
+  const [subscribeEmail, setSubscribeEmail] = useState('')
+
+  const handleSubscribe = (event: FormEvent) => {
+    event.preventDefault()
+    toast.success('Subscribed! Watch your inbox for drops and offers.')
+    setSubscribeEmail('')
+  }
+
   return (
-    <footer className="mt-16 border-t border-white/10 bg-surface px-4 py-8 text-sm text-gray-400">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:justify-between">
+    <footer className="mt-16 border-t border-white/10 px-4 py-12 text-sm text-gray-400">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-[2fr_1fr_1fr_1.3fr]">
         <div>
-          <p className="font-semibold text-white">DotKnot</p>
-          <p className="mt-1">Everyday apparel, shipped across India.</p>
+          <p className="text-xl font-bold text-accent">DotKnot</p>
+          <p className="mt-1 text-gray-300">Embroidered basics, done properly.</p>
+          <p className="mt-4 text-xs text-gray-500">{CONTACT_EMAIL}</p>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <p className="font-medium text-white">Policies</p>
-          <Link to="/policies/shipping" className="hover:text-accent-soft hover:underline">
-            Shipping
-          </Link>
-          <Link to="/policies/refunds" className="hover:text-accent-soft hover:underline">
-            Refunds &amp; Cancellations
-          </Link>
-          <Link to="/policies/terms" className="hover:text-accent-soft hover:underline">
-            Terms &amp; Conditions
-          </Link>
+        <div>
+          <p className="font-bold text-white">Customer Service</p>
+          <ul className="mt-3 space-y-2">
+            {CUSTOMER_SERVICE_LINKS.map((link) => (
+              <li key={link.to}>
+                <Link to={link.to} className="text-gray-400 hover:text-white">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <p className="font-medium text-white">Company</p>
-          <Link to="/about" className="hover:text-accent-soft hover:underline">
-            About
-          </Link>
-          <Link to="/contact" className="hover:text-accent-soft hover:underline">
-            Contact
-          </Link>
+        <div>
+          <p className="font-bold text-white">Follow Us</p>
+          <div className="mt-3 flex gap-3">
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black transition hover:bg-gray-200"
+              >
+                <Icon className="h-5 w-5" />
+              </a>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <p className="font-medium text-white">Follow us</p>
-          <a
-            href="https://wa.me/918437526383"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-accent-soft hover:underline"
-          >
-            WhatsApp
-          </a>
-          <a
-            href="https://www.instagram.com/dotknot.rckkon/"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-accent-soft hover:underline"
-          >
-            Instagram
-          </a>
+        <div>
+          <p className="font-bold text-white">Stay in the Loop</p>
+          <p className="mt-1 text-xs text-gray-400">Get first access to new drops and offers.</p>
+          <form onSubmit={handleSubscribe} className="mt-3 flex">
+            <input
+              type="email"
+              required
+              value={subscribeEmail}
+              onChange={(event) => setSubscribeEmail(event.target.value)}
+              placeholder="Your email"
+              className="min-w-0 flex-1 rounded-l-full bg-white px-4 py-2 text-sm text-black placeholder:text-gray-500 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-r-full bg-accent px-4 py-2 text-sm font-bold text-white hover:bg-accent-soft"
+            >
+              Subscribe
+            </button>
+          </form>
         </div>
       </div>
 
-      <p className="mx-auto mt-6 max-w-6xl border-t border-white/10 pt-4 text-xs text-gray-500">
-        © {new Date().getFullYear()} DotKnot. All rights reserved.
-      </p>
+      <div className="mx-auto mt-10 max-w-6xl border-t border-white/10 pt-6 text-center text-xs text-gray-500">
+        © {new Date().getFullYear()} <span className="font-bold text-accent">DotKnot</span>. All rights reserved.
+      </div>
     </footer>
   )
 }

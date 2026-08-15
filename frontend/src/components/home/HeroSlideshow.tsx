@@ -1,33 +1,43 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface HeroSlideshowProps {
   images: string[]
-  intervalMs?: number
+  pxPerSecond?: number
 }
 
-export function HeroSlideshow({ images, intervalMs = 4000 }: HeroSlideshowProps) {
-  const [index, setIndex] = useState(0)
+export function HeroSlideshow({ images, pxPerSecond = 70 }: HeroSlideshowProps) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const [duration, setDuration] = useState(40)
 
+  // The track renders two back-to-back copies of `images`, so translating by
+  // exactly half its width (-50%) is one full loop and lines back up seamlessly.
   useEffect(() => {
-    if (images.length <= 1) return
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % images.length)
-    }, intervalMs)
-    return () => clearInterval(timer)
-  }, [images.length, intervalMs])
+    if (!trackRef.current) return
+    const loopWidth = trackRef.current.scrollWidth / 2
+    if (loopWidth > 0) setDuration(loopWidth / pxPerSecond)
+  }, [images, pxPerSecond])
+
+  if (images.length === 0) return null
+
+  const track = [...images, ...images]
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-gray-900">
-      {images.map((url, i) => (
-        <img
-          key={url}
-          src={url}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out"
-          style={{ opacity: i === index ? 1 : 0 }}
-        />
-      ))}
-      <div className="absolute inset-0 bg-black/50" />
+      <div
+        ref={trackRef}
+        className="animate-marquee flex h-full w-max"
+        style={{ animationDuration: `${duration}s` }}
+      >
+        {track.map((url, i) => (
+          <img
+            key={`${url}-${i}`}
+            src={url}
+            alt=""
+            className="h-full w-auto shrink-0 border-r border-black/40 object-cover"
+          />
+        ))}
+      </div>
+      <div className="absolute inset-0 bg-black/45" />
     </div>
   )
 }

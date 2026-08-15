@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
+import { ArrowIcon } from '../../components/ui/ArrowIcon'
 
 const inputClass =
   'w-full rounded border border-white/15 bg-surface px-2 py-1 text-sm text-white placeholder:text-gray-500 focus:border-accent focus:outline-none'
@@ -32,6 +34,7 @@ export function CategoriesAdmin() {
 
     if (insertError) {
       setError(insertError.message)
+      toast.error(insertError.message)
       return
     }
 
@@ -40,11 +43,13 @@ export function CategoriesAdmin() {
     setParentId('')
     setError(null)
     queryClient.invalidateQueries({ queryKey: ['admin-categories'] })
+    toast.success('Category created')
   }
 
   const handleDelete = async (id: string) => {
     await supabase.from('categories').delete().eq('id', id)
     queryClient.invalidateQueries({ queryKey: ['admin-categories'] })
+    toast.success('Category deleted')
   }
 
   return (
@@ -58,8 +63,9 @@ export function CategoriesAdmin() {
                 {category.parent_id && <span className="text-gray-500">↳ </span>}
                 {category.name} <span className="text-gray-500">/{category.slug}</span>
               </span>
-              <button type="button" onClick={() => handleDelete(category.id)} className="text-red-400">
-                Delete
+              <button type="button" onClick={() => handleDelete(category.id)} className="brutal-btn">
+                <span>Delete</span>
+                <ArrowIcon />
               </button>
             </div>
           ))}
@@ -80,12 +86,9 @@ export function CategoriesAdmin() {
             ))}
           </select>
           {error && <p className="text-sm text-red-400">{error}</p>}
-          <button
-            type="button"
-            onClick={handleCreate}
-            className="rounded bg-accent px-4 py-2 text-sm text-white hover:bg-accent-soft"
-          >
-            Create category
+          <button type="button" onClick={handleCreate} className="brutal-btn">
+            <span>Create category</span>
+            <ArrowIcon />
           </button>
         </div>
       </div>

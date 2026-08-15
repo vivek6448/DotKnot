@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../hooks/useAuth'
 import { useCart } from '../hooks/useCart'
@@ -8,6 +9,8 @@ import { AuthForm } from '../components/auth/AuthForm'
 import { AddressForm } from '../components/address/AddressForm'
 import { AddressList } from '../components/address/AddressList'
 import { loadRazorpayScript } from '../lib/razorpay'
+import { ArrowIcon } from '../components/ui/ArrowIcon'
+import { ProximityHeading } from '../components/text/ProximityHeading'
 
 export function Checkout() {
   const { user } = useAuth()
@@ -57,6 +60,7 @@ export function Checkout() {
   const handlePay = async () => {
     if (!selectedAddressId) {
       setError('Select or add an address first')
+      toast.error('Select or add an address first')
       return
     }
     setPaying(true)
@@ -68,6 +72,7 @@ export function Checkout() {
 
     if (fnError || !data) {
       setError('Failed to start checkout')
+      toast.error('Failed to start checkout')
       setPaying(false)
       return
     }
@@ -80,7 +85,10 @@ export function Checkout() {
       currency: data.currency,
       order_id: data.razorpay_order_id,
       name: 'DotKnot',
-      handler: () => navigate(`/orders/${data.order_id}`),
+      handler: () => {
+        toast.success('Payment successful')
+        navigate(`/orders/${data.order_id}`)
+      },
       modal: { ondismiss: () => setPaying(false) },
     })
 
@@ -102,7 +110,9 @@ export function Checkout() {
 
   return (
     <div className="mx-auto max-w-xl p-4">
-      <h1 className="mb-6 text-2xl font-semibold text-white">Checkout</h1>
+      <ProximityHeading as="h1" className="mb-6 text-2xl font-semibold text-white">
+        Checkout
+      </ProximityHeading>
 
       <section className="mb-6">
         <h2 className="mb-2 font-medium text-gray-200">Shipping address</h2>
@@ -127,9 +137,10 @@ export function Checkout() {
         type="button"
         onClick={handlePay}
         disabled={paying || !selectedAddressId}
-        className="w-full rounded bg-accent py-2 text-white hover:bg-accent-soft disabled:opacity-40"
+        className="brutal-btn w-full"
       >
-        {paying ? 'Processing…' : 'Pay with Razorpay'}
+        <span>{paying ? 'Processing…' : 'Pay with Razorpay'}</span>
+        <ArrowIcon />
       </button>
     </div>
   )

@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
+import { ProximityHeading } from '../components/text/ProximityHeading'
+import { ArrowIcon } from '../components/ui/ArrowIcon'
 
 export function OrderStatus() {
   const { id } = useParams<{ id: string }>()
@@ -31,9 +33,9 @@ export function OrderStatus() {
   return (
     <div className="mx-auto max-w-md p-8">
       <div className="text-center">
-        <h1 className="mb-2 text-2xl font-semibold text-white">
+        <ProximityHeading as="h1" className="mb-2 text-2xl font-semibold text-white">
           {order.status === 'paid' ? 'Order Confirmed' : 'Order Received'}
-        </h1>
+        </ProximityHeading>
         <p className="text-gray-400">Status: {order.status}</p>
         {order.status === 'pending_payment' && (
           <p className="mt-2 text-sm text-gray-500">Waiting for payment confirmation…</p>
@@ -75,9 +77,12 @@ export function OrderStatus() {
         </div>
       </div>
 
-      <Link to="/orders" className="mt-6 block text-center text-sm text-accent-soft underline">
-        View all orders
-      </Link>
+      <div className="mt-6 flex justify-center">
+        <Link to="/orders" className="brutal-btn">
+          <span>View all orders</span>
+          <ArrowIcon />
+        </Link>
+      </div>
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { ArrowIcon } from '../ui/ArrowIcon'
+
 interface Address {
   id: string
   line1: string
@@ -34,8 +36,9 @@ export function AddressList({ addresses, selectedId, onSelect, onDelete }: Addre
             {address.city}, {address.state} {address.pincode} · {address.phone}
           </span>
           {onDelete && (
-            <button type="button" onClick={() => onDelete(address.id)} className="text-sm text-red-400">
-              Delete
+            <button type="button" onClick={() => onDelete(address.id)} className="brutal-btn">
+              <span>Delete</span>
+              <ArrowIcon />
             </button>
           )}
         </div>

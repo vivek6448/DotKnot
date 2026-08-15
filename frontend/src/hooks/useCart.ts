@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from './useAuth'
 import { getGuestCart, setGuestCart } from '../lib/guestCart'
@@ -117,6 +118,7 @@ export function useCart() {
     }
 
     invalidate()
+    toast.success('Added to cart')
   }
 
   const updateQuantity = async (variantId: string, quantity: number) => {
@@ -136,6 +138,7 @@ export function useCart() {
     }
 
     invalidate()
+    toast.success('Cart updated')
   }
 
   const removeFromCart = async (variantId: string) => {
@@ -148,6 +151,7 @@ export function useCart() {
     }
 
     invalidate()
+    toast.success('Removed from cart')
   }
 
   const lines = query.data ?? []

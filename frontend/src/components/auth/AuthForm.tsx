@@ -1,5 +1,8 @@
 import { useState, type FormEvent } from 'react'
+import { toast } from 'sonner'
 import { useAuth } from '../../hooks/useAuth'
+import { PasswordInput } from '../ui/PasswordInput'
+import { ArrowIcon } from '../ui/ArrowIcon'
 
 export function AuthForm() {
   const { user, loading, signUpWithEmail, signInWithEmail, signOut } = useAuth()
@@ -17,14 +20,17 @@ export function AuthForm() {
 
   if (user) {
     return (
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-sm text-gray-300">
-          Signed in as {user.user_metadata.full_name ?? user.email}
-        </span>
-        <button type="button" onClick={() => signOut()} className="text-sm text-accent-soft underline">
-          Sign out
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={async () => {
+          await signOut()
+          toast.success('Signed out')
+        }}
+        className="brutal-btn w-full"
+      >
+        <span>Sign out</span>
+        <ArrowIcon />
+      </button>
     )
   }
 
@@ -38,13 +44,21 @@ export function AuthForm() {
       const { data, error } = await signUpWithEmail(email, password, name)
       if (error) {
         setError(error.message)
+        toast.error(error.message)
       } else if (!data.session) {
-        setInfo('Check your email to confirm your account before signing in.')
+        const message = 'Check your email to confirm your account before signing in.'
+        setInfo(message)
+        toast.success(message)
+      } else {
+        toast.success('Account created')
       }
     } else {
       const { error } = await signInWithEmail(email, password)
       if (error) {
         setError(error.message)
+        toast.error(error.message)
+      } else {
+        toast.success('Signed in')
       }
     }
 
@@ -74,8 +88,7 @@ export function AuthForm() {
         required
         className={inputClass}
       />
-      <input
-        type="password"
+      <PasswordInput
         placeholder="Password"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
@@ -85,12 +98,9 @@ export function AuthForm() {
       />
       {error && <p className="text-sm text-red-400">{error}</p>}
       {info && <p className="text-sm text-green-400">{info}</p>}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full rounded bg-accent py-2 text-sm text-white hover:bg-accent-soft disabled:opacity-40"
-      >
-        {mode === 'sign-up' ? 'Sign up' : 'Sign in'}
+      <button type="submit" disabled={submitting} className="brutal-btn w-full">
+        <span>{mode === 'sign-up' ? 'Sign up' : 'Sign in'}</span>
+        <ArrowIcon />
       </button>
       <button
         type="button"

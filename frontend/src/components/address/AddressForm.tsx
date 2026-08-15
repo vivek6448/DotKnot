@@ -1,8 +1,10 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
 import { useAuth } from '../../hooks/useAuth'
+import { ArrowIcon } from '../ui/ArrowIcon'
 
 const addressSchema = z.object({
   line1: z.string().min(1, 'Required'),
@@ -42,6 +44,9 @@ export function AddressForm({ onSaved }: AddressFormProps) {
     if (!error && data) {
       reset()
       onSaved(data.id)
+      toast.success('Address saved')
+    } else {
+      toast.error('Failed to save address')
     }
   }
 
@@ -59,12 +64,9 @@ export function AddressForm({ onSaved }: AddressFormProps) {
         <input {...register('pincode')} placeholder="Pincode" className={inputClass} />
         <input {...register('phone')} placeholder="Phone" className={inputClass} />
       </div>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded border border-white/15 px-3 py-1 text-sm text-gray-200 hover:border-accent hover:text-white"
-      >
-        Save address
+      <button type="submit" disabled={isSubmitting} className="brutal-btn">
+        <span>Save address</span>
+        <ArrowIcon />
       </button>
     </form>
   )

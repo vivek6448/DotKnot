@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useIsAdmin } from '../../hooks/useIsAdmin'
+import { ArrowIcon } from '../../components/ui/ArrowIcon'
 
 const TABS = [
   { label: 'Home', href: '/admin/home' },
@@ -24,18 +25,20 @@ export function AdminLayout() {
   return (
     <div className="mx-auto max-w-6xl p-4">
       <h1 className="mb-6 text-2xl font-semibold text-white">Admin</h1>
-      <nav className="mb-6 flex gap-4 border-b border-white/10 pb-4 text-sm">
+      <nav className="mb-6 flex flex-wrap gap-3 border-b border-white/10 pb-6">
         {TABS.map((tab) => (
           <Link
             key={tab.href}
             to={tab.href}
-            className={
+            className="brutal-btn brutal-btn--compact"
+            style={
               location.pathname.startsWith(tab.href)
-                ? 'text-accent-soft'
-                : 'text-gray-300 hover:text-accent-soft'
+                ? ({ ['--brutal-shadow']: 'var(--color-accent)' } as React.CSSProperties)
+                : undefined
             }
           >
-            {tab.label}
+            <span>{tab.label}</span>
+            <ArrowIcon />
           </Link>
         ))}
       </nav>
