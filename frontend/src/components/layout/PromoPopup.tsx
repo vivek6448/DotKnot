@@ -28,25 +28,17 @@ export function PromoPopup() {
   if (!visible || !data?.enabled) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-      onClick={dismiss}
-    >
-      <div
-        className="relative w-full max-w-sm rounded-lg border border-white/10 bg-surface p-6 text-center shadow-xl"
-        onClick={(event) => event.stopPropagation()}
+    <div className="fixed bottom-4 left-4 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-white/10 bg-surface p-4 text-center shadow-xl">
+      <button
+        type="button"
+        onClick={dismiss}
+        aria-label="Close"
+        className="absolute right-3 top-2 text-gray-500 hover:text-white"
       >
-        <button
-          type="button"
-          onClick={dismiss}
-          aria-label="Close"
-          className="absolute right-3 top-2 text-gray-500 hover:text-white"
-        >
-          ✕
-        </button>
-        <h2 className="text-lg font-semibold text-white">{data.title ?? 'Special offer'}</h2>
-        <p className="mt-2 text-sm text-gray-400">{data.text}</p>
-      </div>
+        ✕
+      </button>
+      <h2 className="text-lg font-semibold text-white">{data.title ?? 'Special offer'}</h2>
+      <p className="mt-2 text-sm text-gray-400">{data.text}</p>
     </div>
   )
 }

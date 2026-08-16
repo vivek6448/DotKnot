@@ -1,14 +1,16 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { toast } from 'sonner'
 import { WHATSAPP_URL, INSTAGRAM_URL } from '../components/layout/SocialFloatButtons'
 import { EmailIcon, WhatsAppIcon, InstagramIcon, SendIcon } from '../components/ui/icons'
+import VariableProximity from '../components/text/VariableProximity'
 
-const CONTACT_EMAIL = 'hello@dotknot.in'
+const CONTACT_EMAIL = 'dotknothelp@gmail.com'
 
 const inputClass =
   'w-full rounded-lg border border-white/10 bg-black/30 px-4 py-2.5 text-white placeholder:text-gray-500 focus:border-accent focus:outline-none'
 
 export function Contact() {
+  const headingRef = useRef<HTMLHeadingElement>(null)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
@@ -22,13 +24,29 @@ export function Contact() {
   }
 
   return (
-    <div className="px-4 py-16 sm:py-24">
+    <div className="relative overflow-hidden px-4 py-16 sm:py-24">
       <div className="mx-auto max-w-[1000px]">
         <div className="flex justify-center">
           <div className="inline-block rounded-full border border-white/10 bg-black px-8 py-3 shadow-lg sm:px-10 sm:py-4">
-            <h1 className="text-center text-2xl font-bold sm:text-3xl">
-              <span className="text-white">Get in Touch with </span>
-              <span className="text-accent">DotKnot</span>
+            <h1 ref={headingRef} className="text-center text-2xl font-bold sm:text-3xl">
+              <VariableProximity
+                label="Get in Touch with "
+                className="text-white"
+                fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                toFontVariationSettings="'wght' 900, 'opsz' 40"
+                containerRef={headingRef}
+                radius={140}
+                falloff="linear"
+              />
+              <VariableProximity
+                label="DotKnot"
+                className="text-accent"
+                fromFontVariationSettings="'wght' 400, 'opsz' 9"
+                toFontVariationSettings="'wght' 900, 'opsz' 40"
+                containerRef={headingRef}
+                radius={140}
+                falloff="linear"
+              />
             </h1>
           </div>
         </div>

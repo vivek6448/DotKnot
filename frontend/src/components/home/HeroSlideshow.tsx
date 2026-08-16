@@ -11,10 +11,23 @@ export function HeroSlideshow({ images, pxPerSecond = 70 }: HeroSlideshowProps) 
 
   // The track renders two back-to-back copies of `images`, so translating by
   // exactly half its width (-50%) is one full loop and lines back up seamlessly.
+  // Images finish downloading asynchronously (slowest on a cold cache), which
+  // grows the track's width over time — a ResizeObserver keeps the duration in
+  // sync so the marquee doesn't briefly race through a not-yet-loaded, too-narrow
+  // track at first paint.
   useEffect(() => {
-    if (!trackRef.current) return
-    const loopWidth = trackRef.current.scrollWidth / 2
-    if (loopWidth > 0) setDuration(loopWidth / pxPerSecond)
+    const el = trackRef.current
+    if (!el) return
+
+    const updateDuration = () => {
+      const loopWidth = el.scrollWidth / 2
+      if (loopWidth > 0) setDuration(loopWidth / pxPerSecond)
+    }
+
+    updateDuration()
+    const observer = new ResizeObserver(updateDuration)
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [images, pxPerSecond])
 
   if (images.length === 0) return null

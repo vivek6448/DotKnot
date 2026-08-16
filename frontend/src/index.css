@@ -48,6 +48,21 @@ body::before {
   opacity: 0.5;
 }
 
+body::after {
+  content: '';
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: -1;
+  height: 34rem;
+  pointer-events: none;
+  background-image: radial-gradient(
+    ellipse 65% 100% at 50% -10%,
+    rgba(var(--color-accent-rgb), 0.5),
+    transparent 70%
+  );
+}
+
 .brutal-btn {
   --brutal-shadow: #e5e5e5;
   position: relative;

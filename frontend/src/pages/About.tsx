@@ -11,14 +11,6 @@ const WHY_CHOOSE = [
 export function About() {
   return (
     <div className="relative overflow-hidden px-4 pb-20 pt-6 sm:pb-28 sm:pt-10">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem]"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse 65% 100% at 50% -10%, rgba(var(--color-accent-rgb), 0.5), transparent 70%)',
-        }}
-      />
-
       <div className="relative mx-auto max-w-[950px] rounded-[24px] border border-white/10 bg-black/30 p-8 backdrop-blur-2xl sm:p-12">
         <div className="flex justify-center">
           <div className="inline-block rounded-full border border-white/10 bg-black px-8 py-3 shadow-lg sm:px-10 sm:py-4">
