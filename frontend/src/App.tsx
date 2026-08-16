@@ -68,7 +68,7 @@ function App() {
       />
       <AnnouncementBar />
 
-      <div className="relative hidden h-20 md:block">
+      <div className="sticky top-0 z-40 hidden h-20 md:block">
         <PillNav
           logo="/dotknot-logo.png"
           logoAlt="DotKnot"
@@ -81,10 +81,10 @@ function App() {
         />
       </div>
 
-      <div className="md:hidden">
+      <div className="sticky top-0 z-40 md:hidden">
         <StaggeredMenu
           position="right"
-          items={navItems.map((item) => ({ label: item.label, link: item.href }))}
+          items={navItems.filter((item) => item.href !== '/cart').map((item) => ({ label: item.label, link: item.href }))}
           socialItems={[
             { label: 'WhatsApp', link: WHATSAPP_URL },
             { label: 'Instagram', link: INSTAGRAM_URL },
@@ -97,6 +97,8 @@ function App() {
           openMenuButtonColor="#fff"
           accentColor="#e2452b"
           colors={['#ff7a5c', '#e2452b']}
+          cartHref="/cart"
+          cartCount={itemCount}
         />
       </div>
 

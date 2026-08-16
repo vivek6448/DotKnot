@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion'
 import { useProduct, useRelatedProducts } from '../hooks/useProducts'
 import { useCart } from '../hooks/useCart'
@@ -158,7 +158,13 @@ export function ProductDetail() {
           {product.description && <p className="mt-4 text-sm text-gray-400">{product.description}</p>}
 
           <div className="mt-6">
-            <p className="mb-2 text-sm font-medium text-gray-200">Size</p>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-200">Size</p>
+              <Link to="/policies/size-guide" className="brutal-btn brutal-btn--compact">
+                <span>Size Guide</span>
+                <ArrowIcon />
+              </Link>
+            </div>
             <div className="flex flex-wrap gap-2">
               {variants.map((variant) => (
                 <button

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ProximityHeading } from '../components/text/ProximityHeading'
+import { ArrowIcon } from '../components/ui/ArrowIcon'
 
 const WHY_CHOOSE = [
   'Signature embroidery on every piece',
@@ -15,12 +16,12 @@ export function About() {
         <div className="flex justify-center">
           <div className="inline-block rounded-full border border-white/10 bg-black px-8 py-3 shadow-lg sm:px-10 sm:py-4">
             <ProximityHeading as="h1" className="text-center text-3xl font-bold text-white sm:text-4xl" radius={140}>
-              About DotKnot
+              About Us
             </ProximityHeading>
           </div>
         </div>
 
-        <p className="mx-auto mt-6 max-w-2xl text-center text-[#c5c5c5]">
+        <p className="mx-auto mt-6 max-w-2xl text-left text-[#c5c5c5] sm:text-center">
           <span className="font-bold text-accent">DotKnot</span> is an everyday apparel label built around
           detail. Every piece is designed with intention, made to be worn often and to last.
         </p>
@@ -57,17 +58,21 @@ export function About() {
           </section>
         </div>
 
-        <div className="mt-12 text-center sm:mt-14">
+        <div className="mt-12 text-left sm:mt-14 sm:text-center">
           <p className="text-lg font-bold text-accent sm:text-xl">Join the DotKnot Family</p>
-          <p className="mx-auto mt-2 max-w-md text-[#c5c5c5]">
+          <p className="mt-2 max-w-md text-[#c5c5c5] sm:mx-auto">
             Explore our latest drops and be part of a growing community that values quality and detail.
           </p>
-          <Link
-            to="/products"
-            className="mt-6 inline-block rounded-full bg-accent px-8 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-accent-soft"
-          >
-            Shop Now
-          </Link>
+          <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
+            <Link to="/products" className="brutal-btn">
+              <span>Shop Now</span>
+              <ArrowIcon />
+            </Link>
+            <Link to="/contact" className="brutal-btn">
+              <span>Get in Touch</span>
+              <ArrowIcon />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

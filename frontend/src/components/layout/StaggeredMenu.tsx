@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
+import { CartIcon } from '../ui/icons'
 import './StaggeredMenu.css'
 
 export interface StaggeredMenuItem {
@@ -31,6 +32,8 @@ export interface StaggeredMenuProps {
   closeOnClickAway?: boolean
   onMenuOpen?: () => void
   onMenuClose?: () => void
+  cartHref?: string
+  cartCount?: number
 }
 
 const isExternalLink = (href: string) =>
@@ -60,6 +63,8 @@ export const StaggeredMenu = ({
   closeOnClickAway = true,
   onMenuOpen,
   onMenuClose,
+  cartHref,
+  cartCount = 0,
 }: StaggeredMenuProps) => {
   const [open, setOpen] = useState(false)
   const openRef = useRef(false)
@@ -417,29 +422,38 @@ export const StaggeredMenu = ({
             <img src={logoUrl} alt={logoAlt} className="sm-logo-img" draggable={false} width={110} height={24} />
           </div>
         )}
-        <button
-          ref={toggleBtnRef}
-          className="sm-toggle"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          aria-controls="staggered-menu-panel"
-          onClick={toggleMenu}
-          type="button"
-        >
-          <span ref={textWrapRef} className="sm-toggle-textWrap" aria-hidden="true">
-            <span ref={textInnerRef} className="sm-toggle-textInner">
-              {textLines.map((l, i) => (
-                <span className="sm-toggle-line" key={i}>
-                  {l}
-                </span>
-              ))}
+        <div className="sm-header-right">
+          <button
+            ref={toggleBtnRef}
+            className="sm-toggle"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            aria-controls="staggered-menu-panel"
+            onClick={toggleMenu}
+            type="button"
+          >
+            <span ref={textWrapRef} className="sm-toggle-textWrap" aria-hidden="true">
+              <span ref={textInnerRef} className="sm-toggle-textInner">
+                {textLines.map((l, i) => (
+                  <span className="sm-toggle-line" key={i}>
+                    {l}
+                  </span>
+                ))}
+              </span>
             </span>
-          </span>
-          <span ref={iconRef} className="sm-icon" aria-hidden="true">
-            <span ref={plusHRef} className="sm-icon-line" />
-            <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
-          </span>
-        </button>
+            <span ref={iconRef} className="sm-icon" aria-hidden="true">
+              <span ref={plusHRef} className="sm-icon-line" />
+              <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
+            </span>
+          </button>
+
+          {cartHref && (
+            <Link to={cartHref} className="sm-cart-link" aria-label={`Cart, ${cartCount} items`}>
+              <CartIcon className="h-5 w-5" />
+              {cartCount > 0 && <span className="sm-cart-badge">{cartCount}</span>}
+            </Link>
+          )}
+        </div>
       </header>
 
       <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
