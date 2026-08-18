@@ -61,8 +61,8 @@ export function AddressForm({ onSaved }: AddressFormProps) {
         <input {...register('state')} placeholder="State" className={inputClass} />
       </div>
       <div className="flex gap-2">
-        <input {...register('pincode')} placeholder="Pincode" className={inputClass} />
-        <input {...register('phone')} placeholder="Phone" className={inputClass} />
+        <input {...register('pincode')} placeholder="Pincode" inputMode="numeric" className={inputClass} />
+        <input {...register('phone')} placeholder="Phone" type="tel" inputMode="tel" className={inputClass} />
       </div>
       <button type="submit" disabled={isSubmitting} className="brutal-btn">
         <span>Save address</span>

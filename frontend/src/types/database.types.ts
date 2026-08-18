@@ -225,6 +225,7 @@ export type Database = {
         Row: {
           active: boolean
           code: string
+          description: string | null
           discount_type: string
           discount_value: number
           expires_at: string | null
@@ -234,6 +235,7 @@ export type Database = {
         Insert: {
           active?: boolean
           code: string
+          description?: string | null
           discount_type: string
           discount_value: number
           expires_at?: string | null
@@ -243,6 +245,7 @@ export type Database = {
         Update: {
           active?: boolean
           code?: string
+          description?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null

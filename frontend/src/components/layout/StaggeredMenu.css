@@ -18,6 +18,14 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+[data-open='true'] .staggered-menu-header {
+  background: rgba(10, 10, 12, 0.98);
+  border-bottom-color: transparent;
 }
 
 .sm-logo {
@@ -60,6 +68,15 @@
   justify-content: center;
   color: #e9e9ef;
   text-decoration: none;
+}
+
+/* Invisible hit-area extension — the icon itself is only 20px, well under
+   the 44px minimum tap target, but growing the visible box would also drag
+   the absolutely-positioned cart badge away from the icon's corner. */
+.sm-cart-link::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
 }
 
 .sm-cart-badge {
@@ -143,6 +160,7 @@
   right: 0;
   width: clamp(260px, 78vw, 380px);
   height: 100vh;
+  height: 100dvh;
   background: rgba(10, 10, 12, 0.98);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -177,6 +195,22 @@
 [data-position='left'] .sm-prelayers {
   right: auto;
   left: 0;
+}
+
+@media (max-width: 768px) {
+  .staggered-menu-panel {
+    width: 100vw;
+    border-left: none;
+    border-right: none;
+  }
+
+  .sm-prelayers {
+    width: 100vw;
+  }
+
+  [data-position='left'] .staggered-menu-panel {
+    border-right: none;
+  }
 }
 
 .sm-prelayer {

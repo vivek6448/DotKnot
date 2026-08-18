@@ -12,6 +12,7 @@ const emptyForm = {
   min_order_value: '',
   expires_at: '',
   active: true,
+  description: '',
 }
 
 const inputClass =
@@ -46,6 +47,7 @@ export function CouponsAdmin() {
       min_order_value: data.min_order_value != null ? String(data.min_order_value) : '',
       expires_at: data.expires_at ? data.expires_at.slice(0, 10) : '',
       active: data.active,
+      description: data.description ?? '',
     })
     setError(null)
   }
@@ -65,6 +67,7 @@ export function CouponsAdmin() {
       min_order_value: form.min_order_value ? Number(form.min_order_value) : null,
       expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
       active: form.active,
+      description: form.description.trim() || null,
     }
 
     const { error: saveError } = form.id
@@ -81,6 +84,7 @@ export function CouponsAdmin() {
     setSaving(false)
     setForm(emptyForm)
     queryClient.invalidateQueries({ queryKey: ['admin-coupons'] })
+    queryClient.invalidateQueries({ queryKey: ['active-coupons'] })
     toast.success(form.id ? 'Coupon updated' : 'Coupon created')
   }
 
@@ -88,6 +92,7 @@ export function CouponsAdmin() {
     await supabase.from('coupons').update({ active: !active }).eq('id', id)
     if (form.id === id) setForm((f) => ({ ...f, active: !active }))
     queryClient.invalidateQueries({ queryKey: ['admin-coupons'] })
+    queryClient.invalidateQueries({ queryKey: ['active-coupons'] })
     toast.success(active ? 'Coupon deactivated' : 'Coupon activated')
   }
 
@@ -95,6 +100,7 @@ export function CouponsAdmin() {
     await supabase.from('coupons').delete().eq('id', id)
     if (form.id === id) setForm(emptyForm)
     queryClient.invalidateQueries({ queryKey: ['admin-coupons'] })
+    queryClient.invalidateQueries({ queryKey: ['active-coupons'] })
     toast.success('Coupon deleted')
   }
 
@@ -116,7 +122,7 @@ export function CouponsAdmin() {
               </button>
               <div className="flex items-center gap-3">
                 <button type="button" onClick={() => handleToggleActive(coupon.id, coupon.active)} className="brutal-btn">
-                  <span>{coupon.active ? 'Active' : 'Inactive'}</span>
+                  <span>{coupon.active ? 'Deactivate' : 'Activate'}</span>
                   <ArrowIcon />
                 </button>
                 <button type="button" onClick={() => handleDelete(coupon.id)} className="brutal-btn">
@@ -166,6 +172,16 @@ export function CouponsAdmin() {
             onChange={(e) => setForm((f) => ({ ...f, min_order_value: e.target.value }))}
             className={inputClass}
           />
+          <label className="block text-xs text-gray-400">
+            Promo message (optional)
+            <textarea
+              placeholder="Shown on the homepage popup instead of the auto-generated text, e.g. “Get 20% off your first order!”"
+              value={form.description}
+              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              rows={2}
+              className={`${inputClass} mt-1 resize-none`}
+            />
+          </label>
           <label className="block text-xs text-gray-400">
             Expires on (optional)
             <input

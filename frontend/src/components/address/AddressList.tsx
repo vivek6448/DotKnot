@@ -15,9 +15,10 @@ interface AddressListProps {
   selectedId?: string | null
   onSelect?: (id: string) => void
   onDelete?: (id: string) => void
+  onEdit?: (id: string) => void
 }
 
-export function AddressList({ addresses, selectedId, onSelect, onDelete }: AddressListProps) {
+export function AddressList({ addresses, selectedId, onSelect, onDelete, onEdit }: AddressListProps) {
   return (
     <div className="space-y-2">
       {addresses.map((address) => (
@@ -35,6 +36,12 @@ export function AddressList({ addresses, selectedId, onSelect, onDelete }: Addre
             {address.line1}, {address.line2 ? `${address.line2}, ` : ''}
             {address.city}, {address.state} {address.pincode} · {address.phone}
           </span>
+          {onEdit && (
+            <button type="button" onClick={() => onEdit(address.id)} className="brutal-btn brutal-btn--compact">
+              <span>Edit</span>
+              <ArrowIcon />
+            </button>
+          )}
           {onDelete && (
             <button type="button" onClick={() => onDelete(address.id)} className="brutal-btn">
               <span>Delete</span>

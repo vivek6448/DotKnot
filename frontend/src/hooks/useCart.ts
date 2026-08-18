@@ -10,10 +10,22 @@ export interface CartLine {
   sku: string
   price: number
   product_name: string
+  product_slug: string
   image_url: string | null
 }
 
-function toCartLine(quantity: number, variant: any): CartLine {
+interface RawCartVariant {
+  id: string
+  sku: string
+  price: number
+  products: {
+    name: string
+    slug: string
+    product_images: { url: string; sort_order: number }[]
+  } | null
+}
+
+function toCartLine(quantity: number, variant: RawCartVariant): CartLine {
   const images = [...(variant.products?.product_images ?? [])].sort(
     (a, b) => a.sort_order - b.sort_order,
   )
@@ -23,6 +35,7 @@ function toCartLine(quantity: number, variant: any): CartLine {
     sku: variant.sku,
     price: variant.price,
     product_name: variant.products?.name ?? '',
+    product_slug: variant.products?.slug ?? '',
     image_url: images[0]?.url ?? null,
   }
 }
@@ -58,11 +71,11 @@ export function useCart() {
 
         const { data, error } = await supabase
           .from('cart_items')
-          .select('quantity, product_variants(id, sku, price, products(name, product_images(url, sort_order)))')
+          .select('quantity, product_variants(id, sku, price, products(name, slug, product_images(url, sort_order)))')
           .eq('cart_id', cartId)
 
         if (error) throw error
-        return (data ?? []).map((row: any) => toCartLine(row.quantity, row.product_variants))
+        return (data ?? []).map((row) => toCartLine(row.quantity, row.product_variants as RawCartVariant))
       }
 
       const items = getGuestCart()
@@ -70,7 +83,7 @@ export function useCart() {
 
       const { data, error } = await supabase
         .from('product_variants')
-        .select('id, sku, price, products(name, product_images(url, sort_order))')
+        .select('id, sku, price, products(name, slug, product_images(url, sort_order))')
         .in(
           'id',
           items.map((i) => i.variant_id),

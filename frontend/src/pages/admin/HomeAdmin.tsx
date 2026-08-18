@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
+import { compressImage } from '../../lib/compressImage'
 import { useSetting } from '../../hooks/useSetting'
 import type { Json } from '../../types/database.types'
 import { ArrowIcon } from '../../components/ui/ArrowIcon'
+import { UploadButton } from '../../components/ui/UploadButton'
 
 interface HomeHeroSettings {
   title?: string
@@ -28,13 +30,14 @@ export function HomeAdmin() {
   // Only sync fetched settings into local state once — otherwise a
   // background refetch (window focus, our own invalidateQueries after
   // save/upload) would silently overwrite whatever the admin is typing.
-  useEffect(() => {
-    if (!hero || initialized) return
+  // Set directly during render (not in an effect) so this resolves in the
+  // same pass instead of committing once, then re-rendering a beat later.
+  if (hero && !initialized) {
+    setInitialized(true)
     setTitle(hero.title ?? '')
     setSubtitle(hero.subtitle ?? '')
     setImages(hero.images ?? [])
-    setInitialized(true)
-  }, [hero, initialized])
+  }
 
   const persist = async (next: HomeHeroSettings) => {
     await supabase
@@ -51,8 +54,9 @@ export function HomeAdmin() {
     toast.success('Home page text saved')
   }
 
-  const handleUpload = async (file: File) => {
+  const handleUpload = async (rawFile: File) => {
     setUploading(true)
+    const file = await compressImage(rawFile)
     const path = `hero/${Date.now()}-${file.name}`
     const { error } = await supabase.storage.from('product-images').upload(path, file)
     if (!error) {
@@ -109,20 +113,16 @@ export function HomeAdmin() {
               <button
                 type="button"
                 onClick={() => handleRemoveImage(url)}
-                className="absolute right-0 top-0 bg-black/60 px-1 text-xs text-white"
+                className="absolute right-0 top-0 flex h-7 w-7 items-center justify-center bg-black/60 text-sm text-white"
               >
                 ✕
               </button>
             </div>
           ))}
         </div>
-        <input
-          type="file"
-          accept="image/*"
-          disabled={uploading}
-          onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
-          className="mt-2 text-sm text-gray-300"
-        />
+        <div className="mt-2">
+          <UploadButton uploading={uploading} onFilesSelected={(files) => handleUpload(files[0])} />
+        </div>
       </div>
     </div>
   )

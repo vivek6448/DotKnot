@@ -81,7 +81,7 @@ export function Preloader({ onDone }: PreloaderProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <img src="/dotknot-logo-full.png" alt="DotKnot" className="mb-8 w-72 sm:w-96 md:w-[32rem]" />
+          <img src="/dotknot-logo-full.webp" alt="DotKnot" className="mb-8 w-72 sm:w-96 md:w-[32rem]" />
           <motion.span className="text-6xl font-bold tabular-nums text-white sm:text-7xl md:text-8xl">
             {rounded}
           </motion.span>

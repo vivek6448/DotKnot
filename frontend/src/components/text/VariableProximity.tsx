@@ -2,6 +2,7 @@ import {
   forwardRef,
   useMemo,
   useRef,
+  useState,
   useEffect,
   useCallback,
   type CSSProperties,
@@ -11,8 +12,37 @@ import {
 import { motion } from 'framer-motion'
 import './VariableProximity.css'
 
-function useAnimationFrame(callback: () => void) {
+// Proximity tracking only makes sense with a real, hovering mouse — touch
+// devices have no cursor to track, so running the loop there is pure wasted
+// battery/CPU on every mobile visitor. Also respects prefers-reduced-motion.
+function useProximityEnabled() {
+  const [enabled, setEnabled] = useState(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return false
+    return (
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+  })
+
   useEffect(() => {
+    const hoverQuery = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setEnabled(hoverQuery.matches && !motionQuery.matches)
+    update()
+    hoverQuery.addEventListener('change', update)
+    motionQuery.addEventListener('change', update)
+    return () => {
+      hoverQuery.removeEventListener('change', update)
+      motionQuery.removeEventListener('change', update)
+    }
+  }, [])
+
+  return enabled
+}
+
+function useAnimationFrame(callback: () => void, enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return
     let frameId: number
     const loop = () => {
       callback()
@@ -20,13 +50,15 @@ function useAnimationFrame(callback: () => void) {
     }
     frameId = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(frameId)
-  }, [callback])
+  }, [callback, enabled])
 }
 
-function useMousePositionRef(containerRef?: RefObject<HTMLElement | null>) {
+function useMousePositionRef(enabled: boolean, containerRef?: RefObject<HTMLElement | null>) {
   const positionRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
+    if (!enabled) return
+
     const updatePosition = (x: number, y: number) => {
       if (containerRef?.current) {
         const rect = containerRef.current.getBoundingClientRect()
@@ -37,18 +69,12 @@ function useMousePositionRef(containerRef?: RefObject<HTMLElement | null>) {
     }
 
     const handleMouseMove = (ev: MouseEvent) => updatePosition(ev.clientX, ev.clientY)
-    const handleTouchMove = (ev: TouchEvent) => {
-      const touch = ev.touches[0]
-      updatePosition(touch.clientX, touch.clientY)
-    }
 
     window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('touchmove', handleTouchMove)
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('touchmove', handleTouchMove)
     }
-  }, [containerRef])
+  }, [enabled, containerRef])
 
   return positionRef
 }
@@ -81,9 +107,9 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
     ...restProps
   } = props
 
+  const enabled = useProximityEnabled()
   const letterRefs = useRef<Array<HTMLSpanElement | null>>([])
-  const interpolatedSettingsRef = useRef<string[]>([])
-  const mousePositionRef = useMousePositionRef(containerRef)
+  const mousePositionRef = useMousePositionRef(enabled, containerRef)
   const lastPositionRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null })
 
   const parsedSettings = useMemo(() => {
@@ -133,7 +159,7 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
     }
     lastPositionRef.current = { x, y }
 
-    letterRefs.current.forEach((letterRef, index) => {
+    letterRefs.current.forEach((letterRef) => {
       if (!letterRef) return
 
       const rect = letterRef.getBoundingClientRect()
@@ -160,13 +186,12 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
         })
         .join(', ')
 
-      interpolatedSettingsRef.current[index] = newSettings
       letterRef.style.fontVariationSettings = newSettings
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerRef, radius, falloff, fromFontVariationSettings, parsedSettings])
 
-  useAnimationFrame(tick)
+  useAnimationFrame(tick, enabled)
 
   const words = label.split(' ')
   let letterIndex = 0
@@ -189,10 +214,7 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
                 ref={(el) => {
                   letterRefs.current[currentLetterIndex] = el
                 }}
-                style={{
-                  display: 'inline-block',
-                  fontVariationSettings: interpolatedSettingsRef.current[currentLetterIndex],
-                }}
+                style={{ display: 'inline-block', fontVariationSettings: fromFontVariationSettings }}
                 aria-hidden="true"
               >
                 {letter}

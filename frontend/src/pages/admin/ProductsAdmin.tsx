@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { supabase } from '../../lib/supabaseClient'
+import { compressImage } from '../../lib/compressImage'
 import { ArrowIcon } from '../../components/ui/ArrowIcon'
+import { UploadButton } from '../../components/ui/UploadButton'
 
 const STATUS_OPTIONS = ['draft', 'active', 'archived']
 const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
@@ -207,7 +209,8 @@ export function ProductsAdmin() {
     let nextSortOrder = images?.length ?? 0
     let failures = 0
 
-    for (const [i, file] of Array.from(files).entries()) {
+    for (const [i, rawFile] of Array.from(files).entries()) {
+      const file = await compressImage(rawFile)
       const path = `${productId}/${Date.now()}-${i}-${file.name}`
       const { error: uploadError } = await supabase.storage.from('product-images').upload(path, file)
       if (uploadError) {
@@ -240,11 +243,12 @@ export function ProductsAdmin() {
     toast.success('Image removed')
   }
 
-  const handleUploadTrendingImage = async (file: File) => {
+  const handleUploadTrendingImage = async (rawFile: File) => {
     if (!form.id) return
     const productId = form.id
     setUploadingTrending(true)
 
+    const file = await compressImage(rawFile)
     const path = `${productId}/trending-${Date.now()}-${file.name}`
     const { error: uploadError } = await supabase.storage.from('product-images').upload(path, file)
     if (uploadError) {
@@ -278,11 +282,12 @@ export function ProductsAdmin() {
     toast.success('Trending image removed')
   }
 
-  const handleUploadFeaturedImage = async (file: File) => {
+  const handleUploadFeaturedImage = async (rawFile: File) => {
     if (!form.id) return
     const productId = form.id
     setUploadingFeatured(true)
 
+    const file = await compressImage(rawFile)
     const path = `${productId}/featured-${Date.now()}-${file.name}`
     const { error: uploadError } = await supabase.storage.from('product-images').upload(path, file)
     if (uploadError) {
@@ -481,24 +486,17 @@ export function ProductsAdmin() {
                   <button
                     type="button"
                     onClick={handleRemoveTrendingImage}
-                    className="absolute right-0 top-0 bg-black/60 px-1 text-xs text-white"
+                    className="absolute right-0 top-0 flex h-7 w-7 items-center justify-center bg-black/60 text-sm text-white"
                   >
                     ✕
                   </button>
                 </div>
               ) : (
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploadingTrending}
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) handleUploadTrendingImage(e.target.files[0])
-                    e.target.value = ''
-                  }}
-                  className="text-sm text-gray-300"
+                <UploadButton
+                  uploading={uploadingTrending}
+                  onFilesSelected={(files) => handleUploadTrendingImage(files[0])}
                 />
               )}
-              {uploadingTrending && <p className="mt-1 text-xs text-gray-400">Uploading…</p>}
             </div>
           )}
 
@@ -529,25 +527,16 @@ export function ProductsAdmin() {
                     <button
                       type="button"
                       onClick={() => handleDeleteImage(image.id)}
-                      className="absolute right-0 top-0 bg-black/60 px-1 text-xs text-white"
+                      className="absolute right-0 top-0 flex h-7 w-7 items-center justify-center bg-black/60 text-sm text-white"
                     >
                       ✕
                     </button>
                   </div>
                 ))}
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                disabled={uploading}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files.length > 0) handleUploadImages(e.target.files)
-                  e.target.value = ''
-                }}
-                className="mt-2 text-sm text-gray-300"
-              />
-              {uploading && <p className="mt-1 text-xs text-gray-400">Uploading…</p>}
+              <div className="mt-2">
+                <UploadButton multiple uploading={uploading} onFilesSelected={handleUploadImages} />
+              </div>
             </div>
 
             <div className="mt-6 rounded border border-white/10 p-3">
@@ -564,30 +553,23 @@ export function ProductsAdmin() {
                   <button
                     type="button"
                     onClick={handleRemoveFeaturedImage}
-                    className="absolute right-0 top-0 bg-black/60 px-1 text-xs text-white"
+                    className="absolute right-0 top-0 flex h-7 w-7 items-center justify-center bg-black/60 text-sm text-white"
                   >
                     ✕
                   </button>
                 </div>
               ) : (
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploadingFeatured}
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) handleUploadFeaturedImage(e.target.files[0])
-                    e.target.value = ''
-                  }}
-                  className="text-sm text-gray-300"
+                <UploadButton
+                  uploading={uploadingFeatured}
+                  onFilesSelected={(files) => handleUploadFeaturedImage(files[0])}
                 />
               )}
-              {uploadingFeatured && <p className="mt-1 text-xs text-gray-400">Uploading…</p>}
             </div>
 
             <div className="mt-6">
               <h3 className="mb-2 text-sm font-medium text-gray-200">Variants</h3>
               <div className="space-y-1">
-                {variants?.map((variant: any) => (
+                {variants?.map((variant) => (
                   <div key={variant.id} className="flex items-center gap-2 text-sm">
                     <span className="w-32 shrink-0 truncate text-gray-400" title={variant.sku}>
                       {variant.sku}

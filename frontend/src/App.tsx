@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import PillNav from './components/layout/PillNav'
@@ -11,27 +11,30 @@ import { SocialFloatButtons, WHATSAPP_URL, INSTAGRAM_URL } from './components/la
 import { useAuth } from './hooks/useAuth'
 import { useCart } from './hooks/useCart'
 import { useIsAdmin } from './hooks/useIsAdmin'
-import { Home } from './pages/Home'
-import { ProductListing } from './pages/ProductListing'
-import { ProductDetail } from './pages/ProductDetail'
-import { Cart } from './pages/Cart'
-import { Checkout } from './pages/Checkout'
-import { OrderStatus } from './pages/OrderStatus'
-import { OrderHistory } from './pages/OrderHistory'
-import { Account } from './pages/Account'
-import { Addresses } from './pages/Addresses'
-import { About } from './pages/About'
-import { Contact } from './pages/Contact'
-import { Shipping } from './pages/policies/Shipping'
-import { Refunds } from './pages/policies/Refunds'
-import { Terms } from './pages/policies/Terms'
-import { SizeGuide } from './pages/policies/SizeGuide'
-import { AdminLayout } from './pages/admin/AdminLayout'
-import { HomeAdmin } from './pages/admin/HomeAdmin'
-import { ProductsAdmin } from './pages/admin/ProductsAdmin'
-import { CategoriesAdmin } from './pages/admin/CategoriesAdmin'
-import { CouponsAdmin } from './pages/admin/CouponsAdmin'
-import { OrdersAdmin } from './pages/admin/OrdersAdmin'
+
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })))
+const ProductListing = lazy(() => import('./pages/ProductListing').then((m) => ({ default: m.ProductListing })))
+const ProductDetail = lazy(() => import('./pages/ProductDetail').then((m) => ({ default: m.ProductDetail })))
+const Cart = lazy(() => import('./pages/Cart').then((m) => ({ default: m.Cart })))
+const Checkout = lazy(() => import('./pages/Checkout').then((m) => ({ default: m.Checkout })))
+const OrderStatus = lazy(() => import('./pages/OrderStatus').then((m) => ({ default: m.OrderStatus })))
+const OrderHistory = lazy(() => import('./pages/OrderHistory').then((m) => ({ default: m.OrderHistory })))
+const Account = lazy(() => import('./pages/Account').then((m) => ({ default: m.Account })))
+const Addresses = lazy(() => import('./pages/Addresses').then((m) => ({ default: m.Addresses })))
+const About = lazy(() => import('./pages/About').then((m) => ({ default: m.About })))
+const Contact = lazy(() => import('./pages/Contact').then((m) => ({ default: m.Contact })))
+const Shipping = lazy(() => import('./pages/policies/Shipping').then((m) => ({ default: m.Shipping })))
+const Refunds = lazy(() => import('./pages/policies/Refunds').then((m) => ({ default: m.Refunds })))
+const Terms = lazy(() => import('./pages/policies/Terms').then((m) => ({ default: m.Terms })))
+const SizeGuide = lazy(() => import('./pages/policies/SizeGuide').then((m) => ({ default: m.SizeGuide })))
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then((m) => ({ default: m.AdminLayout })))
+const HomeAdmin = lazy(() => import('./pages/admin/HomeAdmin').then((m) => ({ default: m.HomeAdmin })))
+const ProductsAdmin = lazy(() => import('./pages/admin/ProductsAdmin').then((m) => ({ default: m.ProductsAdmin })))
+const CategoriesAdmin = lazy(() =>
+  import('./pages/admin/CategoriesAdmin').then((m) => ({ default: m.CategoriesAdmin })),
+)
+const CouponsAdmin = lazy(() => import('./pages/admin/CouponsAdmin').then((m) => ({ default: m.CouponsAdmin })))
+const OrdersAdmin = lazy(() => import('./pages/admin/OrdersAdmin').then((m) => ({ default: m.OrdersAdmin })))
 
 function App() {
   const { user } = useAuth()
@@ -70,7 +73,7 @@ function App() {
 
       <div className="sticky top-0 z-40 hidden h-20 md:block">
         <PillNav
-          logo="/dotknot-logo.png"
+          logo="/dotknot-logo.webp"
           logoAlt="DotKnot"
           items={navItems}
           activeHref={location.pathname}
@@ -91,7 +94,7 @@ function App() {
           ]}
           displaySocials
           displayItemNumbering
-          logoUrl="/dotknot-logo.png"
+          logoUrl="/dotknot-logo.webp"
           logoAlt="DotKnot"
           menuButtonColor="#fff"
           openMenuButtonColor="#fff"
@@ -103,30 +106,32 @@ function App() {
       </div>
 
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductListing />} />
-          <Route path="/products/:slug" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orders" element={<OrderHistory />} />
-          <Route path="/orders/:id" element={<OrderStatus />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/addresses" element={<Addresses />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/policies/shipping" element={<Shipping />} />
-          <Route path="/policies/refunds" element={<Refunds />} />
-          <Route path="/policies/terms" element={<Terms />} />
-          <Route path="/policies/size-guide" element={<SizeGuide />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route path="home" element={<HomeAdmin />} />
-            <Route path="products" element={<ProductsAdmin />} />
-            <Route path="categories" element={<CategoriesAdmin />} />
-            <Route path="coupons" element={<CouponsAdmin />} />
-            <Route path="orders" element={<OrdersAdmin />} />
-          </Route>
-        </Routes>
+        <Suspense fallback={<p className="p-8 text-center text-gray-400">Loading…</p>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<ProductListing />} />
+            <Route path="/products/:slug" element={<ProductDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<OrderHistory />} />
+            <Route path="/orders/:id" element={<OrderStatus />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/addresses" element={<Addresses />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/policies/shipping" element={<Shipping />} />
+            <Route path="/policies/refunds" element={<Refunds />} />
+            <Route path="/policies/terms" element={<Terms />} />
+            <Route path="/policies/size-guide" element={<SizeGuide />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="home" element={<HomeAdmin />} />
+              <Route path="products" element={<ProductsAdmin />} />
+              <Route path="categories" element={<CategoriesAdmin />} />
+              <Route path="coupons" element={<CouponsAdmin />} />
+              <Route path="orders" element={<OrdersAdmin />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </main>
 
       <Footer />

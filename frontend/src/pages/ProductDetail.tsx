@@ -16,9 +16,11 @@ const slideVariants = {
   exit: (direction: number) => ({ x: direction < 0 ? 300 : -300, opacity: 0 }),
 }
 
-function sizeOf(variant: any): string {
+type ProductVariant = NonNullable<ReturnType<typeof useProduct>['data']>['product_variants'][number]
+
+function sizeOf(variant: ProductVariant): string {
   const entry = variant.variant_attribute_values.find(
-    (vav: any) => vav.attribute_values?.attributes?.name === 'Size',
+    (vav) => vav.attribute_values?.attributes?.name === 'Size',
   )
   return entry?.attribute_values?.value ?? variant.sku
 }

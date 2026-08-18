@@ -54,24 +54,6 @@ export function SearchIcon({ className = 'h-4 w-4' }: IconProps) {
   )
 }
 
-export function SendIcon({ className = 'h-4 w-4' }: IconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="m22 2-11 11" />
-      <path d="M22 2 15 22l-4-9-9-4Z" />
-    </svg>
-  )
-}
-
 export function CartIcon({ className = 'h-4 w-4' }: IconProps) {
   return (
     <svg

@@ -11,6 +11,7 @@ import { AddressList } from '../components/address/AddressList'
 import { loadRazorpayScript } from '../lib/razorpay'
 import { ArrowIcon } from '../components/ui/ArrowIcon'
 import { ProximityHeading } from '../components/text/ProximityHeading'
+import { CouponForm, type AppliedCoupon } from '../components/cart/CouponForm'
 
 export function Checkout() {
   const { user } = useAuth()
@@ -20,11 +21,12 @@ export function Checkout() {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [discount, setDiscount] = useState(0)
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null)
+  const discount = appliedCoupon?.discount_amount ?? 0
 
-  // A coupon may already be attached to the cart from the Cart page — reapply
-  // it (idempotent) so the total shown here matches what create-razorpay-order
-  // will actually charge.
+  // A coupon may already be attached to the cart from the Cart page (or from
+  // a previous visit here) — reapply it (idempotent) so the total shown here
+  // matches what create-razorpay-order will actually charge.
   useEffect(() => {
     if (!user) return
     supabase
@@ -37,7 +39,7 @@ export function Checkout() {
         supabase.functions
           .invoke('apply-coupon', { body: { code: cart.coupon_code } })
           .then(({ data }) => {
-            if (data) setDiscount(data.discount_amount)
+            if (data) setAppliedCoupon({ code: data.code, discount_amount: data.discount_amount })
           })
       })
   }, [user])
@@ -122,13 +124,17 @@ export function Checkout() {
               addresses={addresses}
               selectedId={selectedAddressId}
               onSelect={setSelectedAddressId}
+              onEdit={() => navigate('/addresses')}
             />
           </div>
         )}
         <AddressForm onSaved={handleAddressSaved} />
       </section>
 
-      {discount > 0 && <p className="mb-1 text-sm text-green-400">Coupon discount: -₹{discount}</p>}
+      <section className="mb-6">
+        <CouponForm applied={appliedCoupon} onApplied={setAppliedCoupon} />
+      </section>
+
       <p className="mb-4 text-lg font-medium text-white">Total: ₹{subtotal - discount}</p>
 
       {error && <p className="mb-2 text-sm text-red-400">{error}</p>}
