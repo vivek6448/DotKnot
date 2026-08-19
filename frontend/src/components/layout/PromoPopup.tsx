@@ -34,7 +34,7 @@ export function PromoPopup() {
       : `₹${activeCoupon.discount_value} off`
 
   return (
-    <div className="fixed bottom-4 left-4 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-white/10 bg-surface p-4 text-center shadow-xl">
+    <div className="fixed bottom-36 right-4 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-white/10 bg-surface p-4 text-center shadow-xl">
       <button
         type="button"
         onClick={dismiss}
