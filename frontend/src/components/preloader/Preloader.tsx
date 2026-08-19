@@ -81,11 +81,12 @@ export function Preloader({ onDone }: PreloaderProps) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <img src="/dotknot-logo-full.webp" alt="DotKnot" className="mb-8 w-72 sm:w-96 md:w-[32rem]" />
-          <motion.span className="text-6xl font-bold tabular-nums text-white sm:text-7xl md:text-8xl">
+          <img src="/dotknot-logo-full.webp" alt="DotKnot" className="mb-0 w-72 sm:w-96 md:w-[32rem]" />
+          <motion.span className="-mt-20 text-6xl font-bold tabular-nums text-white sm:-mt-28 sm:text-7xl md:-mt-36 md:text-8xl">
             {rounded}
           </motion.span>
           <motion.div className="mt-6 h-px w-40 sm:w-56" style={{ backgroundColor: dividerColor }} />
+          <div aria-hidden="true" className="h-20 sm:h-28 md:h-36" />
         </motion.div>
       )}
     </AnimatePresence>
